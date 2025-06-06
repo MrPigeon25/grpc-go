@@ -1,0 +1,35 @@
+name: Trivy Security Scan
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  trivy-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          trivy-version: 'latest'
+      
+      - name: Run Trivy filesystem scan
+        id: trivy-fs-scan
+        run: |
+          trivy fs --security-checks vuln --severity CRITICAL ./
+          if [ $? -eq 0 ]; then
+            echo "No critical vulnerabilities found"
+          else
+            echo "Critical vulnerabilities detected"
+            exit 1
+          fi
