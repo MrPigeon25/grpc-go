@@ -1,24 +1,36 @@
+
 name: TrivySecurityScan
 
 on:
   push:
     branches:
       - main
+  
   pull_request:
     types: [opened, synchronize]
 
 jobs:
+
   scan:
+  
     runs-on: ubuntu-latest
+ 
     steps:
+
       - name: Checkout repository
         uses: actions/checkout@v3
+      
 
       - name: Install Trivy
         run: |
+         
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -
+          
+         
           export PATH=$PATH:/home/runner/.local/bin
-
+      
+     
       - name: Run Trivy Scan
         run: |
+        
           trivy fs . --exit-code 1 --severity CRITICAL,HIGH
